@@ -22,12 +22,11 @@ export default function Home() {
         body: JSON.stringify({ company, domain }),
       });
 
-      if (!res.ok) throw new Error('Request failed');
       const data = await res.json();
-      if (data.error) throw new Error(data.error);
+      if (!res.ok || data.error) throw new Error(data.error || 'Request failed');
       setResult(data);
     } catch (e) {
-      setError('Something went wrong. Check the company info and try again.');
+      setError(e.message || 'Something went wrong. Check the company info and try again.');
     } finally {
       setLoading(false);
     }

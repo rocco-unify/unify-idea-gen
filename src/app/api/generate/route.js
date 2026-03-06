@@ -49,7 +49,7 @@ export async function POST(request) {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6-20250627',
+        model: 'claude-sonnet-4-5-20250514',
         max_tokens: 1000,
         system: SYSTEM_PROMPT,
         messages: [
@@ -62,12 +62,17 @@ export async function POST(request) {
     });
 
     const data = await res.json();
+
+    if (!res.ok) {
+      return Response.json({ error: data.error?.message || 'Anthropic API error' }, { status: res.status });
+    }
+
     const text = data.content?.find(b => b.type === 'text')?.text || '';
     const clean = text.replace(/```json|```/g, '').trim();
     const parsed = JSON.parse(clean);
 
     return Response.json(parsed);
   } catch (e) {
-    return Response.json({ error: 'Generation failed' }, { status: 500 });
+    return Response.json({ error: e.message || 'Generation failed' }, { status: 500 });
   }
 }
